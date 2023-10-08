@@ -8,6 +8,7 @@ Run the script with the desired options:
 
 ```bash
 python tools.py [options]
+```
 
 ## Options
 
