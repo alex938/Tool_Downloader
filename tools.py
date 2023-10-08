@@ -90,9 +90,15 @@ def create_multi_handler(ip, port):
         pass
     
 def download_tools():
-    download = DownloadFile() 
-    for file_to_download in apps_to_download:
-        download.get_file(file_to_download)
+    print("\n--- Downloading tools ---")
+    try:
+        download = DownloadFile() 
+        for file_to_download in apps_to_download:
+            download.get_file(file_to_download)
+    except Exception as err:
+        print("Error downloading tool: " + str(err))
+    finally:
+        pass
   
 def main():
     if 'all' in args.actions or 'tools' in args.actions:
